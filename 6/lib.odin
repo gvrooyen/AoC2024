@@ -76,6 +76,7 @@ obstacle_ahead :: proc(pos: [2]int, dir: direction) -> bool {
 
 part1 :: proc() -> int {
     visited := make(map[[2]int]bool)
+    defer delete(visited)
     pos := start_pos
     dir := start_dir
 
@@ -87,8 +88,43 @@ part1 :: proc() -> int {
     return len(visited)
 }
 
+Heading :: struct {
+    pos: [2]int,
+    dir: direction,
+}
+
 part2 :: proc() -> int {
     result := 0
 
+    for row in 0..<len(grid) {
+        for col in 0..<len(grid[0]) {
+            if !grid[row][col] && !(row == start_pos[0] && col == start_pos[1]) {
+                grid[row][col] = true
+                visited := make(map[Heading]bool)
+                defer delete(visited)
+                pos := start_pos
+                dir := start_dir
+                walk: for within_bounds(pos) {
+                    h: Heading = {pos, dir}
+                    if visited[h] {
+                        result += 1
+                        break walk
+                    }
+                    visited[h] = true
+                    for obstacle_ahead(pos, dir) {
+                        dir = turn[dir]
+                        h: Heading = {pos, dir}
+                        if visited[h] {
+                            result += 1
+                            break walk
+                        }
+                        visited[h] = true
+                    }
+                    pos = pos + delta[dir]
+                }
+                grid[row][col] = false
+            }
+        }
+    }
     return result
 }
