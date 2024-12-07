@@ -69,9 +69,7 @@ ternary_inc :: proc(seq: ^[dynamic]int) {
 
 pow :: proc(base: int, exp: int) -> int {
     acc := base
-    for _ in 0..<(exp - 1) {
-        acc *= base
-    }
+    for _ in 1..<exp do acc *= base
     return acc
 }
 
